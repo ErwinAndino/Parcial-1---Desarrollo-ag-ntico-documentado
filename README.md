@@ -13,28 +13,40 @@ Esta plantilla prepara un repositorio publico e individual para proyectos academ
 
 ## Datos del proyecto
 
-- Estudiante: [PENDIENTE]
-- Materia, comision y anio: [PENDIENTE]
-- Nombre del proyecto: [PENDIENTE]
-- Motor y version: [PENDIENTE]
-- Estado: [PENDIENTE]
+- Estudiante: Erwin Andino
+- Materia, comision y anio: Programacion de Inteligencia Artificial y Patrones de Comportamiento (PIAPC); Comision VJ; 2026
+- Nombre del proyecto: Videojuego rpg top down
+- Motor y version: Phaser 4.2.1 con Vite 8.3.0
+- Estado: En desarrollo. Base minima implementada y validada por prueba manual en navegador (movimiento WASD, ataque con clic izquierdo y enemigo); el sistema de niveles es el proximo paso.
 
 ## Descripcion
 
-[Explica brevemente el juego o prototipo y su objetivo actual.]
+Videojuego RPG de vista superior (top-down) en 2D. El jugador controla un Heroe que se mueve con WASD y ataca con el clic izquierdo del mouse en un arco frontal, para matar monstruos que patrullan el mapa. La base minima esta implementada: el Heroe ataca a un enemigo con corazones que patrulla y persigue, y al matarlo obtiene 5 XP. El sistema de niveles, la victoria y el reset por derrota son el proximo paso.
 
 ## Requisitos y ejecucion
 
-[Indica el motor, herramientas, versiones y pasos necesarios para abrir o ejecutar el proyecto.]
+- Node.js con npm (usado para ejecutar Vite y Phaser).
+- Version de motor: Phaser 4.2.1; build tool: Vite 8.3.0.
+
+Pasos para ejecutar:
+
+```
+npm install
+npm run dev
+```
+
+Para compilar a produccion: `npm run build`.
 
 ## Controles
 
-[Describe los controles disponibles o indica que todavia no existen.]
+- WASD: mover al Heroe.
+- Clic izquierdo del mouse: atacar en un arco frontal.
+- R: reiniciar la escena tras la derrota.
 
 ## Creditos
 
-[Declara assets, sonidos, tipografias, plugins, codigo, referencias y licencias de terceros.]
+Sin assets de terceros. La representacion usa figuras geometricas generadas con Phaser. No hay sonidos, imagenes, tipografias ni plugins externos.
 
 ## Entrega o demostracion
 
-[Agrega el enlace a una compilacion, video o publicacion cuando la entrega lo requiera.]
+[PENDIENTE - agregar compilacion, video o publicacion cuando la entrega lo requiera.]
