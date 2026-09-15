@@ -13,7 +13,7 @@ Esta carpeta contiene los artefactos que permiten explicar y verificar el trabaj
 
 ## Documentos
 
-- `prompt-inicial-opencode.md`: consulta inicial de solo lectura para preparar el contexto.
+- `prompt.md`: consulta de solo lectura para preparar el contexto.
 - `auditoria-repositorio.md`: hechos observados sobre estructura, flujo, pruebas y comandos.
 - `especificacion.md`: alcance y criterios de aceptacion verificables.
 - `plan.md`: cambios minimos, verificaciones, riesgos y condiciones de detencion.
