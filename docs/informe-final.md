@@ -171,4 +171,4 @@ Historial de la entrega (`git log --oneline`):
 - `2261ea0` Registra la re-ejecucion de los tests Node y los resultados reales para la entrega
 - `3e73e52`..`407495a` desarrollo previo (dash, mapa/pathfinding, docs, base minima e commits iniciales)
 - `8c685fb` cierre de documentacion de la entrega (este informe, el README y el registro)
-- `<HASH>` cierre definitivo de la entrega (prueba manual de Fases 2-5 confirmada en `docs/evidencia-pruebas.md` y checklist `docs/prueba-manual-checklist.md`)
+- `514b0e7` cierre definitivo de la entrega (prueba manual de Fases 2-5 confirmada en `docs/evidencia-pruebas.md` y checklist `docs/prueba-manual-checklist.md`)
