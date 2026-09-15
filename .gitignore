@@ -6,3 +6,9 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Node y Vite (motor del proyecto)
+node_modules/
+dist/
+.vite/
+*.log
