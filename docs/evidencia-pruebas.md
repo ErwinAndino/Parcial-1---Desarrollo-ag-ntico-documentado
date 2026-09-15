@@ -2,6 +2,8 @@
 
 Relaciona cada criterio de aceptacion con una prueba o secuencia manual que otra persona pueda repetir.
 
+Revision final para la entrega (2026-09-15): todos los tests automatizados Node se re-ejecutaron sobre la rama `main` (codigo en el commit `8afc53d`, scripts de test versionados en el commit `e86890e`) y los resultados reales de esa corrida quedaron reflejados mas abajo; las filas con "Local (sin commit)" corresponden a corridas previas que quedan versionadas a partir de esos commits.
+
 | Criterio | Version validada | Metodo o comando | Pasos | Resultado esperado | Resultado observado | Evidencia |
 |---|---|---|---|---|---|---|
 | Movimiento con WASD | Local (sin commit) | `npm run dev` + secuencia manual | 1. `npm run dev`. 2. Abrir `http://localhost:5173`. 3. Mantener W/S/A/D y combinaciones. | El cuadrado azul se mueve en la direccion presionada al mismo largo (velocidad constante) y no sale del mundo. | Confirmado: el heroe se mueve correctamente en las 4 direcciones y en diagonales, sin salir del mundo. | Prueba manual del estudiante en navegador + salida de `npm run build`. |
@@ -98,7 +100,7 @@ El usuario reporto que los enemigos, al tener una pared en frente, se quedaban a
 |---|---|---|---|---|---|---|
 | Persecucion a traves de una pared | Local (sin commit) | `npm run dev` + secuencia manual | 1. Ponerse al otro lado de una pared con pasillo dentro del rango. 2. Observar. | El enemigo rodea la pared por el pasillo sin quedarse trabado en el borde y alcanza al jugador. | Pendiente de prueba manual. | Se completa tras la verificacion del estudiante. |
 | Sin atasco en el borde de la pared | Local (sin commit) | `npm run dev` + secuencia manual | 1. Provocar persecucion y patrulla con paredes de frente por varios minutos. | Ningun enemigo queda atascado contra el canto de una pared; si se traba un instante, avanza para desatascarse. | Pendiente de prueba manual. | Se completa tras la verificacion del estudiante. |
-| Rutas sin recorte de esquina | Local (sin commit) | Test automatizado Node | 1. Ejecutar `route-test.mjs` (2000 rutas aleatorias). | Ningun atajo podado deja el cuerpo del enemigo dentro de una pared; los pasos ortogonales entre celdas se conservan. | Confirmado: 1998/2000 rutas con camino, 0 atajos recortados, 6/6 comprobaciones OK. | Salida del test en Node. |
+| Rutas sin recorte de esquina | Local (sin commit) | Test automatizado Node | 1. Ejecutar `route-test.mjs` (2000 rutas aleatorias). | Ningun atajo podado deja el cuerpo del enemigo dentro de una pared; los pasos ortogonales entre celdas se conservan. | Confirmado en la re-ejecucion final: 1997/2000 rutas con camino, 0 atajos recortados, 4/4 comprobaciones OK. | Salida del test en Node. |
 | Vision y salto con holgura | Local (sin commit) | Test automatizado Node | 1. Ejecutar `vision-test.mjs` y `pathfind-test.mjs`. | La linea de vision corta cada pared real; un tramo a 12 px de una pared es libre al rayo pero bloqueado para el cuerpo; la poda directa en campo abierto sigue funcionando. | Confirmado: 30/30 y 12/12. | Salida de los tests en Node. |
 | Regresion Fases 1-4 | Local (sin commit) | `npm run dev` + tests Node | 1. Repetir movimiento, combate, progresion, spawn y conectividad. | Ningun comportamiento previo se altero. | Confirmado por tests: conectividad 1697/1697, spawn 2000/2000, spawn-multi 0 violaciones, walls 5/5; la parte manual queda pendiente. | Salida de los tests en Node. |
 

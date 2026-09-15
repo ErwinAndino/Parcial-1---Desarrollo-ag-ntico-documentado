@@ -116,7 +116,7 @@ El usuario reporto que los enemigos, con una pared en frente, se quedaban atasca
 
 ## Validacion (Fase 3-III)
 
-- Automatizada (Node): `route-test.mjs` con 2000 rutas aleatorias y 0 atajos podados con recorte de esquina (1998 rutas con camino, camino directo en campo abierto preservado); regresion completa OK (`vision-test` 30/30, `pathfind-test` 12/12, `connectivity-test` 1697/1697, `spawn-test` 2000/2000, `spawn-multi-test` 0 violaciones, `walls-test` 5/5).
+- Automatizada (Node): `route-test.mjs` con 2000 rutas aleatorias y 0 atajos podados con recorte de esquina (1997 rutas con camino en la re-ejecucion final, camino directo en campo abierto preservado); regresion completa OK (`vision-test` 30/30, `pathfind-test` 12/12, `connectivity-test` 1697/1697, `spawn-test` 2000/2000, `spawn-multi-test` 0 violaciones, `walls-test` 5/5).
 - Build: `npm run build` compila en ~523 ms, 7 modulos transformados; advertencia de tamano de chunk no bloqueante.
 - Pendiente de prueba manual del estudiante: persecucion y patrulla rodeando paredes sin atascarse en el borde, y regresion interactiva de Fases 1-4.
 
@@ -136,7 +136,7 @@ Se implemento una esquivada (dash) para el heroe: con Espacio avanza 140 px en 2
 - Cambios realizados:
   - `src/dash.js` (nuevo): `computeDashEnd(startX, startY, dirX, dirY, distance, walls, worldW, worldH, half)` — barrido de 4 px sobre el segmento que recorta el endpoint contra los muros (acepta claves `width`/`height` de Phaser y `w`/`h` del layout) y contra los bordes del mundo.
   - `src/main.js`: constantes `DASH_DISTANCE=140`, `DASH_DURATION=200`, `DASH_COOLDOWN=1000`, `DASH_BODY_HALF=16+4`; tecla `SPACE` con `JustDown`; estado (`dashing`, `dashTimer`, `dashCooldown`, `dashInvuln`, `dashStart/End`); `startDash` y `updateDash` (aplicacion posicional con easing-out y `body.reset`); `handlePlayerMovement` se salta durante el tramo; `damagePlayer` retorna temprano con `dashInvuln`; tint `0x63e6be` durante el dash; linea de recarga en `updateHud`; limpieza del estado del dash en el congelamiento por derrota/victoria.
-  - `dash-test.mjs` (nuevo): test Node ad hoc del endpoint (patron de los tests previos, no versionado).
+  - `dash-test.mjs` (nuevo): test Node ad hoc del endpoint (patron de los tests previos, ya versionado en el repositorio).
   - Documentacion: `docs/especificacion.md`, `docs/plan.md`, `docs/evidencia-pruebas.md`, `docs/registro-intervencion.md`, `docs/informe-final.md`, `README.md`.
 - Decisiones humanas relevantes (Fase 5): tecla Espacio; direccion = ultima direccion de movimiento (sin input reciente usa la ultima, default abajo); distancia 140 px en 200 ms (tramo corto y rapido); enfriamiento 1000 ms desde el disparo; HUD con linea de dash; invulnerabilidad total durante el tramo; dash y ataque coexisten; el endpoint recortado consume igual el enfriamiento.
 - Dato de validacion interno: al implementar se detecto que el endpoint ignoraba los muros definidos con claves `w`/`h`; se normalizo en `blockedAt` y el test de muros paso.
