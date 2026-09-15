@@ -152,3 +152,59 @@ La partida comienza con 5 enemigos y cada subida de nivel agrega 2 enemigos: al 
 ## Preguntas abiertas (Fase 4)
 
 - Valores finos de las distancias si la prueba manual muestra apilamiento o dispersion excesiva con 7 enemigos.
+
+## Fase 5 - Dash del heroe
+
+## Problema
+
+El heroe se desplaza a velocidad constante (200 px/s) y solo esquiva el daño saliendo del alcance de contacto. No existe una accion dedicada para esquivar ataques ni para desplazarse rapido por el mapa: quien juega no puede reaccionar con un movimiento corto y rapido, y el avance sobre el mapa grande (2000x1500) es lento.
+
+## Resultado esperado
+
+El heroe puede ejecutar una esquivada (dash) corta y rapida con la tecla Espacio: avanza 140 px en 200 ms hacia la ultima direccion de movimiento (invariante: siempre definida, con default hacia abajo), recortada contra paredes y bordes del mundo (nunca la atraviesa), con enfriamiento de 1 s para evitar el uso continuo, invulnerabilidad total durante el tramo para esquivar el daño por contacto, y una linea en el HUD que muestra la recarga. El dash convive con el ataque en ambas direcciones (puede iniciarse durante el barrido y el ataque puede lanzarse durante el dash si su enfriamiento lo permite) sin alterar el combate, la progresion, el spawn, las paredes, la camara ni la IA ya verificadas.
+
+## Alcance de la Fase 5
+
+- Incluye:
+  - Tecla dedicada: Espacio (`KeyCodes.SPACE`), disparo con `JustDown` (patron de R), con guardas de partida (no durante `gameOver`/`victory`), de dash activo y de enfriamiento.
+  - Direccion: `this.facing` (ultima direccion de movimiento, que persiste al soltar las teclas; default `(0,1)` al inicio). No hay caso de sin direccion.
+  - Distancia/duracion/velocidad: `DASH_DISTANCE=140 px`, `DASH_DURATION=200 ms`, interpolacion con easing-out (terminacion limpia, sin saltos ni cortes); `setVelocity(0)` durante el tramo.
+  - Enfriamiento: `DASH_COOLDOWN=1000 ms` desde el disparo (patron de `attackCooldown`); HUD con linea `Dash: listo / recargando x.x s`.
+  - Paredes y bordes: endpoint precalculado en modulo puro `src/dash.js` (`computeDashEnd`) que recorta el segmento contra las 24 paredes (holgura del cuerpo 16+4 px) y contra los bordes del mundo (margen 16 px); el dash nunca atraviesa muros ni queda trabado (termina en la cara del muro).
+  - Combate: invulnerabilidad total durante el dash (`dashInvuln` gatea `damagePlayer`); no se toca la invuln post-dano (1,2 s) ni `Math.max(0, hp)`; el ataque conserva su enfriamiento y su barrido.
+  - Feedback visual: el heroe cambia a un tint verde agua durante el dash.
+- No incluye: cambios a `walls.js`, `pathfinding.js`, la IA, el combate base (arcos, dano, corazones), la progresion (XP, niveles, victoria), el spawn de enemigos, la camara ni `index.html`; ni assets, sonidos o plugins.
+
+## Restricciones adicionales
+
+- Fisica arcade de Phaser se mantiene para colisiones; el dash es geometrico (posicion interpolada) y no modifica colliders.
+- `npm run build` sin errores; advertencia de tamano de chunk existente no bloqueante.
+
+## Casos y criterios de aceptacion (Fase 5)
+
+| Caso | Dado | Cuando | Entonces | Evidencia |
+|---|---|---|---|---|
+| Disparador | El juego corre en `npm run dev` | El jugador pulsa Espacio | El heroe ejecuta un dash por pulsacion; mantener la tecla no encadena | Prueba manual reproducible |
+| Direccion | El heroe se movio con WASD | El jugador pulsa Espacio sin mover | El dash avanza hacia la ultima direccion de movimiento; sin input previo, hacia abajo (default) | Prueba manual reproducible |
+| Distancia | Campo abierto | El jugador hace dash | El heroe recorre ~140 px en ~200 ms con parada suave | Prueba manual reproducible + test Node |
+| Enfriamiento | El jugador hizo un dash | Pulsa Espacio antes de 1 s | El segundo dash no se dispara hasta terminar la recarga; el HUD muestra `Dash: recargando x.x s` | Prueba manual reproducible |
+| Paredes | Hay un muro en la direccion del dash | El jugador hace dash contra el muro | El heroe termina en la cara del muro, no lo atraviesa y no queda trabado | Prueba manual reproducible + test Node |
+| Limites del mundo | El heroe esta cerca de un borde | El jugador hace dash hacia el borde | El heroe no sale del mundo (margen de su cuerpo) | Prueba manual reproducible + test Node |
+| Combate (invuln) | Un enemigo esta en contacto | El jugador hace dash atravesandolo | El heroe no pierde corazones durante el tramo; tras el dash, el daño normal vuelve a aplicar | Prueba manual reproducible |
+| Convivencia con ataque | El dash esta activo o el barrido esta en curso | El jugador hace dash y ataca | Ambos coexisten: el dash puede iniciar durante el barrido y el ataque durante el dash si su enfriamiento lo permite; el arco sigue al heroe | Prueba manual reproducible |
+| Fin de partida | Game over o victoria | El jugador pulsa Espacio | El dash no se dispara; uno en curso queda congelado | Prueba manual reproducible |
+| Error (build) | Codigo completo | `npm run build` | Compila sin errores | Salida del comando |
+
+## Invariantes (Fase 5)
+
+- El dash avanza como maximo 140 px, no atraviesa paredes y no saca al heroe del mundo.
+- El dash consume siempre su enfriamiento, aun recortado o bloqueado por un muro.
+- Los corazones nunca bajan de 0; el ataque conserva su enfriamiento y su barrido.
+- El heroe es invulnerable al daño por contacto solo durante el tramo del dash.
+- Se mantienen los invariantes de las Fases 1-4 (mundo > pantalla, paredes estaticas, camara, HUD fijo, corazones, enfriamiento del ataque, no dependencias).
+- No se agregan dependencias; no se tocan paredes, camara, IA, spawn ni progresion.
+
+## Preguntas abiertas (Fase 5)
+
+- Valores finos del dash (distancia 140, duracion 200 ms, cooldown 1 s, holgura 4 px) si la prueba manual los muestra muy cortos, muy lentos o demasiado frecuentes.
+- Si el dash recortado a casi 0 px por un muro debe consumir igual el enfriamiento (se mantiene SI por simplicidad y castigo tactico, hasta evidencia manual en contrario).

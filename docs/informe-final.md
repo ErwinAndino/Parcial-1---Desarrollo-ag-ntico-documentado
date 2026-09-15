@@ -124,3 +124,31 @@ El usuario reporto que los enemigos, con una pared en frente, se quedaban atasca
 
 - Los pasos ortogonales entre celdas junto a las caras siguen apoyandose en el deslizamiento del collider; si en algun caso el enemigo se traba igual, el desatasco ahora avanza de waypoint, pero queda pendiente de confirmar en la prueba manual.
 - Si un enemigo llegara a atravesar o quedarse atascado permanentemente en una pared, se debe frenar y consultar.
+
+## Fase 5 - Dash del heroe
+
+## Resultado
+
+Se implemento una esquivada (dash) para el heroe: con Espacio avanza 140 px en 200 ms hacia la ultima direccion de movimiento (default hacia abajo sin input previo) con easing-out y terminacion limpia, enfriamiento de 1 s desde el disparo, invulnerabilidad total durante el tramo, endpoint precalculado contra las 24 paredes (holgura del cuerpo 16+4 px) y contra los bordes del mundo (margen 16 px), y una linea `Dash: listo / recargando x.x s` en el HUD. El dash y el ataque coexisten en ambas direcciones: el dash puede iniciarse durante el barrido y el ataque puede lanzarse durante el dash si su enfriamiento lo permite (el arco se redibuja en la posicion viva del heroe), sin alterar la mecanica del ataque. `npm run build` compila sin errores (8 modulos) y la logica del endpoint fue verificada con un test en Node. La verificacion interactiva queda pendiente de prueba manual del estudiante.
+
+## Cambios y decisiones (Fase 5)
+
+- Cambios realizados:
+  - `src/dash.js` (nuevo): `computeDashEnd(startX, startY, dirX, dirY, distance, walls, worldW, worldH, half)` — barrido de 4 px sobre el segmento que recorta el endpoint contra los muros (acepta claves `width`/`height` de Phaser y `w`/`h` del layout) y contra los bordes del mundo.
+  - `src/main.js`: constantes `DASH_DISTANCE=140`, `DASH_DURATION=200`, `DASH_COOLDOWN=1000`, `DASH_BODY_HALF=16+4`; tecla `SPACE` con `JustDown`; estado (`dashing`, `dashTimer`, `dashCooldown`, `dashInvuln`, `dashStart/End`); `startDash` y `updateDash` (aplicacion posicional con easing-out y `body.reset`); `handlePlayerMovement` se salta durante el tramo; `damagePlayer` retorna temprano con `dashInvuln`; tint `0x63e6be` durante el dash; linea de recarga en `updateHud`; limpieza del estado del dash en el congelamiento por derrota/victoria.
+  - `dash-test.mjs` (nuevo): test Node ad hoc del endpoint (patron de los tests previos, no versionado).
+  - Documentacion: `docs/especificacion.md`, `docs/plan.md`, `docs/evidencia-pruebas.md`, `docs/registro-intervencion.md`, `docs/informe-final.md`, `README.md`.
+- Decisiones humanas relevantes (Fase 5): tecla Espacio; direccion = ultima direccion de movimiento (sin input reciente usa la ultima, default abajo); distancia 140 px en 200 ms (tramo corto y rapido); enfriamiento 1000 ms desde el disparo; HUD con linea de dash; invulnerabilidad total durante el tramo; dash y ataque coexisten; el endpoint recortado consume igual el enfriamiento.
+- Dato de validacion interno: al implementar se detecto que el endpoint ignoraba los muros definidos con claves `w`/`h`; se normalizo en `blockedAt` y el test de muros paso.
+
+## Validacion (Fase 5)
+
+- Automatizada (Node): `dash-test.mjs` con 8 comprobaciones OK: campo abierto alcanza 140 px exactos (incluida diagonal), dash contra muro termina en la cara sin penetrar, dash a contacto bloqueado queda en el lugar, borde del mundo clampa al margen del cuerpo, 200 dashes aleatorios a distancia plena dentro del mundo y 500 dashes aleatorios que nunca terminan dentro de una pared ni fuera del mundo.
+- Build: `npm run build` compila en ~576 ms, 8 modulos transformados; advertencia de tamano de chunk no bloqueante.
+- Pendiente de prueba manual del estudiante: disparador y cooldown, direccion, recorte contra paredes/bordes, invuln en el tramo, convivencia con el ataque, freno en fin de partida y regresion de Fases 1-4.
+
+## Limites y riesgos pendientes
+
+- La verificacion manual interactiva del dash queda pendiente del estudiante en `npm run dev`.
+- El dash termina si se dispara pegado a un muro en esa direccion (recorte a casi 0 px) consumiendo el enfriamiento; es comportamiento documentado hasta la prueba manual.
+- Si la prueba manual mostrara que el dash atraviesa un muro, deja al heroe trabado o vuelve la huida ilimitada, se debe frenar y consultar antes de ajustar valores.

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { WALL_LAYOUT, WALL_COLOR } from './walls.js';
 import { createNavGrid, findPath, hasClearLine, worldToCell, sameCell, BODY_CLEARANCE } from './pathfinding.js';
+import { computeDashEnd } from './dash.js';
 
 const CONFIG = {
     WIDTH: 800,
@@ -32,7 +33,12 @@ const CONFIG = {
     NAV_CELL: 40,
     WALL_PADDING: 8,
     PATH_RECOMPUTE_MS: 300,
-    PATH_STUCK_MS: 500
+    PATH_STUCK_MS: 500,
+    DASH_DISTANCE: 140,
+    DASH_DURATION: 200,
+    DASH_COOLDOWN: 1000,
+    DASH_BODY_HALF: 16 + 4,
+    DASH_COLOR: 0x63e6be
 };
 
 class GameScene extends Phaser.Scene {
@@ -67,6 +73,7 @@ class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.addKeys('W,A,S,D');
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        this.dashKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.playerHp = CONFIG.PLAYER_MAX_HP;
         this.playerMaxHp = CONFIG.PLAYER_MAX_HP;
@@ -80,6 +87,12 @@ class GameScene extends Phaser.Scene {
         this.attackCooldown = 0;
         this.attackHitSet = new Set();
         this.playerInvuln = 0;
+        this.dashing = false;
+        this.dashTimer = 0;
+        this.dashCooldown = 0;
+        this.dashInvuln = false;
+        this.dashStart = new Phaser.Math.Vector2();
+        this.dashEnd = new Phaser.Math.Vector2();
         this.gameOver = false;
         this.victory = false;
 
@@ -114,9 +127,15 @@ class GameScene extends Phaser.Scene {
         }
 
         if (this.gameOver || this.victory) {
+            this.dashing = false;
+            this.dashInvuln = false;
             this.player.body.setVelocity(0, 0);
             for (const enemy of this.enemies) enemy.rect.body.setVelocity(0, 0);
             return;
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(this.dashKey)) {
+            this.startDash();
         }
 
         if (this.attacking) {
@@ -130,8 +149,13 @@ class GameScene extends Phaser.Scene {
             }
         }
         if (this.attackCooldown > 0) this.attackCooldown -= delta;
-        if (this.playerInvuln > 0) {
-            this.playerInvuln -= delta;
+        if (this.dashCooldown > 0) this.dashCooldown -= delta;
+        this.updateDash(delta);
+        if (this.playerInvuln > 0) this.playerInvuln -= delta;
+
+        if (this.dashing) {
+            this.player.setFillStyle(CONFIG.DASH_COLOR, 1);
+        } else if (this.playerInvuln > 0) {
             this.player.setFillStyle(0xffffff, 0.7);
         } else {
             this.player.setFillStyle(0x4dabf7, 1);
@@ -183,6 +207,10 @@ class GameScene extends Phaser.Scene {
     }
 
     handlePlayerMovement() {
+        if (this.dashing) {
+            this.player.body.setVelocity(0, 0);
+            return;
+        }
         const keys = this.cursors;
         let vx = 0;
         let vy = 0;
@@ -427,6 +455,44 @@ class GameScene extends Phaser.Scene {
         this.drawAttackArc();
     }
 
+    startDash() {
+        if (this.dashing || this.dashCooldown > 0 || this.gameOver || this.victory) return;
+        const end = computeDashEnd(
+            this.player.x,
+            this.player.y,
+            this.facing.x,
+            this.facing.y,
+            CONFIG.DASH_DISTANCE,
+            this.wallRects,
+            CONFIG.WORLD_WIDTH,
+            CONFIG.WORLD_HEIGHT,
+            CONFIG.DASH_BODY_HALF
+        );
+        this.dashStart.set(this.player.x, this.player.y);
+        this.dashEnd.set(end.x, end.y);
+        this.dashTimer = CONFIG.DASH_DURATION;
+        this.dashCooldown = CONFIG.DASH_COOLDOWN;
+        this.dashing = true;
+        this.dashInvuln = true;
+        this.player.setFillStyle(CONFIG.DASH_COLOR, 1);
+    }
+
+    updateDash(delta) {
+        if (!this.dashing) return;
+        this.dashTimer -= delta;
+        if (this.dashTimer <= 0) {
+            this.dashing = false;
+            this.dashInvuln = false;
+            return;
+        }
+        const t = 1 - this.dashTimer / CONFIG.DASH_DURATION;
+        const eased = 1 - (1 - t) * (1 - t);
+        const x = this.dashStart.x + (this.dashEnd.x - this.dashStart.x) * eased;
+        const y = this.dashStart.y + (this.dashEnd.y - this.dashStart.y) * eased;
+        this.player.setPosition(x, y);
+        this.player.body.reset(x, y);
+    }
+
     updateAttack() {
         if (!this.attacking || this.victory || this.gameOver) return;
 
@@ -549,7 +615,7 @@ for (let i = 0; i < CONFIG.ENEMIES_PER_LEVEL; i++) {
     }
 
     damagePlayer() {
-        if (this.playerInvuln > 0 || this.victory) return;
+        if (this.playerInvuln > 0 || this.victory || this.dashInvuln) return;
         this.playerHp = Math.max(0, this.playerHp - 1);
         this.playerInvuln = CONFIG.PLAYER_INVULN_TIME;
         if (this.playerHp <= 0) {
@@ -581,6 +647,9 @@ for (let i = 0; i < CONFIG.ENEMIES_PER_LEVEL; i++) {
 
     updateHud() {
         let text = `Vida: ${this.hearts(this.playerMaxHp, this.playerHp)}\nNivel: ${this.playerLevel}\nXP: ${this.xp}`;
+        text += this.dashCooldown > 0
+            ? `\nDash: recargando ${(this.dashCooldown / 1000).toFixed(1)} s`
+            : '\nDash: listo';
         if (this.victory) text += '\nVICTORIA: presiona R para reiniciar';
         else if (this.gameOver) text += '\nDERROTA: presiona R para reiniciar';
         this.hud.setText(text);

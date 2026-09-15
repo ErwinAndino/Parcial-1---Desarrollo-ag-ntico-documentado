@@ -59,3 +59,15 @@ Cambia la cantidad de enemigos sobre la Fase 3 estable: 5 iniciales en vez de 1,
 | 2 | Bucles de creacion inicial y por nivel (crear 5 al inicio, 2 por subida) | `src/main.js` | `npm run build` + conteo manual | Bajo: bucles | Crear enemigos de mas en el salto a nivel 3 |
 | 3 | Spawn con distancia a otros enemigos (reintentos 120 + fallback a celda libre) | `src/main.js` | `npm run build` + test automatizado Node + manual | Medio: apilamiento | Aparecer enemigos apilados sin causa comprendida |
 | 4 | Documentacion | `docs/especificacion.md`, `docs/plan.md`, `docs/evidencia-pruebas.md`, `docs/registro-intervencion.md`, `docs/informe-final.md`, `README.md` | Contraste de lo escrito con lo probado | Medio: evidencia inventada | Resultados no verificados |
+
+## Fase 5 - Dash del heroe (aprobada)
+
+Responde al objetivo de diseno: que quien juega pueda esquivar ataques y desplazarse rapido por el mapa con una esquivada corta, sin atravesar paredes y sin huida ilimitada. Decisiones acordadas con el estudiante: tecla dedicada Espacio; direccion = ultima direccion de movimiento (`facing`, default abajo); distancia 140 px en 200 ms con easing-out y terminacion limpia; enfriamiento 1000 ms desde el disparo con linea informativa en el HUD; endpoint precalculado contra paredes (holgura 16+4 px) y bordes del mundo (margen 16 px) en un modulo puro testeable; invulnerabilidad total durante el tramo; el dash y el ataque coexisten en ambas direcciones sin tocar la mecanica del ataque.
+
+| Paso | Cambio minimo | Archivos previstos | Verificacion | Riesgo | Condicion de detencion |
+|---:|---|---|---|---|---|
+| 1 | Modulo puro `computeDashEnd` + test Node | `src/dash.js` (nuevo), `dash-test.mjs` (nuevo) | `node dash-test.mjs` | Medio: geometria del endpoint | Endpoint dentro de pared o fuera del mundo |
+| 2 | Config, tecla Space y estado del dash | `src/main.js` | `npm run build` | Bajo: constantes/input | Tecla en uso o guardas incompletas |
+| 3 | `startDash`/`updateDash` con interpolacion, `body.reset` y salto de `handlePlayerMovement` durante el tramo | `src/main.js` | `npm run build` + manual 4 dirs/diagonal/wall | Alto: movimiento base | Dash atraviesa muro o altera la marcha WASD |
+| 4 | Invuln durante el dash (guarda en `damagePlayer`) y linea `Dash:` en el HUD | `src/main.js` | `npm run build` + manual esquivar enemigo | Medio: combate | Dano durante dash o corazones < 0 |
+| 5 | Pruebas manuales y documentacion | `docs/especificacion.md`, `docs/plan.md`, `docs/evidencia-pruebas.md`, `docs/registro-intervencion.md`, `docs/informe-final.md`, `README.md` | Contraste de lo escrito con lo probado | Medio: evidencia inventada | Resultados no verificados |
