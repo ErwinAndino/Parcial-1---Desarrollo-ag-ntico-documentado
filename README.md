@@ -50,7 +50,7 @@ Sin assets de terceros. La representacion usa figuras geometricas generadas con 
 
 ## Entrega o demostracion
 
-Repositorio: `https://github.com/ErwinAndino/Parcial-1---Desarrollo-ag-ntico-documentado` (rama `main`; push final al commit `<HASH>`).
+Repositorio: `https://github.com/ErwinAndino/Parcial-1---Desarrollo-ag-ntico-documentado` (rama `main`; push final al commit `8c685fb`).
 
 Herramienta agentica: opencode (agente CLI de codigo). El proceso completo (auditoria, GDD, especificacion, plan, matriz de permisos, registro de intervencion, evidencia de pruebas e informe final) esta documentado en `docs/` y todo el desarrollo fue por fases aprobadas.
 

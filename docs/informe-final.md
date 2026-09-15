@@ -170,4 +170,4 @@ Historial de la entrega (`git log --oneline`):
 - `e86890e` Versiona tests Node de validacion re-ejecutados (pathfinding, walls, conectividad, spawn, vision y rutas)
 - `2261ea0` Registra la re-ejecucion de los tests Node y los resultados reales para la entrega
 - `3e73e52`..`407495a` desarrollo previo (dash, mapa/pathfinding, docs, base minima e commits iniciales)
-- `<HASH>` cierre de documentacion de la entrega (este informe, el README y el registro)
+- `8c685fb` cierre de documentacion de la entrega (este informe, el README y el registro)
