@@ -116,7 +116,7 @@ El usuario reporto que los enemigos, con una pared en frente, se quedaban atasca
 
 ## Validacion (Fase 3-III)
 
-- Automatizada (Node): `route-test.mjs` con 2000 rutas aleatorias y 0 atajos podados con recorte de esquina (1997 rutas con camino en la re-ejecucion final, camino directo en campo abierto preservado); regresion completa OK (`vision-test` 30/30, `pathfind-test` 12/12, `connectivity-test` 1697/1697, `spawn-test` 2000/2000, `spawn-multi-test` 0 violaciones, `walls-test` 5/5).
+- Automatizada (Node): `route-test.mjs` con 2000 rutas aleatorias y 0 atajos podados con recorte de esquina (1999/2000 rutas con camino en la re-ejecucion final, 1997 en una corrida previa; el conteo varia levemente por aleatoriedad y ronda >1000 de 2000; camino directo en campo abierto preservado); regresion completa OK (`vision-test` 30/30, `pathfind-test` 12/12, `connectivity-test` 1697/1697, `spawn-test` 2000/2000, `spawn-multi-test` 0 violaciones, `walls-test` 5/5).
 - Build: `npm run build` compila en ~523 ms, 7 modulos transformados; advertencia de tamano de chunk no bloqueante.
 - Pendiente de prueba manual del estudiante: persecucion y patrulla rodeando paredes sin atascarse en el borde, y regresion interactiva de Fases 1-4.
 
@@ -152,3 +152,22 @@ Se implemento una esquivada (dash) para el heroe: con Espacio avanza 140 px en 2
 - La verificacion manual interactiva del dash queda pendiente del estudiante en `npm run dev`.
 - El dash termina si se dispara pegado a un muro en esa direccion (recorte a casi 0 px) consumiendo el enfriamiento; es comportamiento documentado hasta la prueba manual.
 - Si la prueba manual mostrara que el dash atraviesa un muro, deja al heroe trabado o vuelve la huida ilimitada, se debe frenar y consultar antes de ajustar valores.
+
+## Alcance frente a la consigna y cierre
+
+La consigna pedia una intervencion pequeña con proceso agéntico documentado. El proyecto amplio el alcance en fases consultadas y aprobadas con el estudiante (registradas en `GDD.md`, `docs/especificacion.md` y `docs/plan.md`): base minima, sistema de progresion, mapa con obstaculos y camara, escalado de enemigos, dos correcciones de IA (seguimiento directo y atasco en bordes) y dash del heroe. Cada fase se valido con `npm run build` y con tests automatizados en Node sobre los modulos puros de `src/`; la verificacion interactiva en navegador queda pendiente de prueba manual del estudiante (casos marcados como "Pendiente de prueba manual" en `docs/evidencia-pruebas.md`).
+
+Limites conocidos y decisiones de la entrega:
+
+- `node_modules/` y `dist/` quedaron trackeados en commits previos (entraron con el commit `9a3ace2`, ~3880 archivos; el historial `.git` pesa 35,44 MB). No se reescribio el historial; desde el commit `8afc53d` el `.gitignore` los excluye (`node_modules/`, `dist/`, `.vite/`, `*.log`) y los commits de cierre no los incluyen.
+- De los tests Node citados en la evidencia, solo `dash-test.mjs` estaba versionado; los 7 restantes se recrearon y re-ejecutaron y quedaron versionados en el commit `e86890e`. Los resultados reales de la re-ejecucion del 2026-09-15 estan en `docs/evidencia-pruebas.md`.
+- No se instalaron dependencias nuevas ni se uso red durante el desarrollo; el push de la entrega fue autorizado por el estudiante.
+- El repositorio no contiene secretos ni credenciales.
+
+Historial de la entrega (`git log --oneline`):
+
+- `8afc53d` Deja de trackear node_modules y dist; agrega reglas al gitignore
+- `e86890e` Versiona tests Node de validacion re-ejecutados (pathfinding, walls, conectividad, spawn, vision y rutas)
+- `2261ea0` Registra la re-ejecucion de los tests Node y los resultados reales para la entrega
+- `3e73e52`..`407495a` desarrollo previo (dash, mapa/pathfinding, docs, base minima e commits iniciales)
+- `<HASH>` cierre de documentacion de la entrega (este informe, el README y el registro)
